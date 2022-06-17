@@ -18,6 +18,22 @@ serverURL=""        # i.e.: https://server.domain.tld:port or https://instance.j
 userName=""         # it is recommended to create a dedicated read-only user that has read-only access to scripts
 userPasswd=""
 
+# Check if the script is launched with sh, if yes, output some text and exit
+runningShell=$(ps -hp $$ | tail -n 1 | awk '{ print $4}')
+scriptName="$0"
+
+if [[ "$runningShell" == "sh" ]]; then
+    echo "You seem to be running this script using: sh $scriptName"
+    echo "Please either make it executable with 'chmod u+x $scriptName' and then run './$scriptName'"
+    echo "or use 'bash $scriptName'"
+    echo "This script does not run well with sh"
+    echo "For your convenience, we're relaunching $scriptName with bash"
+    echo ""
+    bash "$PWD/$scriptName" 
+    exit 0
+fi
+
+
 ##### Function CatchInvokeRestMethodErrors #####
 # Function to do a curl and catch http code, if not 200, outputs a message to the user
 # The function requires 4 parameters:
@@ -105,19 +121,6 @@ if [[ -z "$userPasswd" ]]; then
     echo "The password you typed is: NO, I won't show..."
     echo
     askedForLine=1
-fi
-
-# Check if the script is launched with sh, if yes, output some text and exit
-runningShell=$(ps -hp $$ | tail -n 1 | awk '{ print $4}')
-scriptName="$0"
-
-if [[ "$runningShell" == "sh" ]]; then
-    echo "You seem to be running this script using: sh $scriptName"
-    echo "Please either make it executable with 'chmod u+x $scriptName' and then run './$scriptName'"
-    echo "or use 'bash $scriptName'"
-    echo "This script does not run well with sh"
-    echo "Sorry for the invonvenience"
-    exit 0
 fi
 
 # Let's ask for the search string if nothing is passed as an argument
