@@ -145,6 +145,13 @@ fi
 ## Get Jamf Pro version to use token auth if >= 10.35
 jamfProVersion=$(CatchInvokeRestMethodErrors -uri "$serverURL/JSSCheckConnection" -Method GET -Authorization "foo" -accept "*/*" | awk -F"." '{ print $1$2 }')
 
+## If Jamf Pro is >= 10.42 we need to have a change in the scripts URL
+if [[ "$jamfProVersion" -ge 1042 ]]; then
+    computerURL="computer-management"
+else
+    computerURL="computer"
+fi
+
 # Encode username and password to use Basic Authorization
 encodedAuthorization=$(printf '%s' "$userName:$userPasswd" | /usr/bin/iconv -t ISO-8859-1 | base64)
 
@@ -223,7 +230,7 @@ searchScripts () {
                     # Let's tell you what we found
                     echo "The script called \"$scriptName\" contains $contentSearch $occurenceName of \"$searchString\""
                     echo "Script ID is: $scriptID"
-                    echo "Script URL is: $serverURL/view/settings/computer/scripts/$scriptID"
+                    echo "Script URL is: $serverURL/view/settings/$computerURL/scripts/$scriptID"
                     echo "$lineNumbersName \"$searchString\": $lineNumbers"
                     echo ""
                     ((countScriptsFound++))

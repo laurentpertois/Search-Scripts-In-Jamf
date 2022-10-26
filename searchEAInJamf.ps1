@@ -126,6 +126,13 @@ While ( $serverURL -notmatch '[a-z0-9]$' ) {
 # Get Jamf Pro version to use token auth if >= 10.35
 $jamfProVersion = ((CatchInvokeRestMethodErrors -uri $serverURL/JSSCheckConnection -Method GET -Authorization "foo" -accept "*/*").Split(".")[0,1]) -join ""
 
+## If Jamf Pro is >= 10.42 we need to have a change in the scripts URL
+If ( "$jamfProVersion" -ge 1042 ) {
+    $ComputerURL="computer-management"
+} Else {
+    $ComputerURL="computer"
+}
+
 # Prepare for token acquisition
 $combineCreds = "$($userName):$($userPasswd)"
 $encodeCreds = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($CombineCreds))
